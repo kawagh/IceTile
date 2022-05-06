@@ -3,39 +3,61 @@ package jp.kawagh.icetile
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlin.math.abs
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PuzzleScreen() {
     var currentPosition by remember {
         mutableStateOf(0)
     }
+    var directionState by remember {
+        mutableStateOf("-")
+    }
     val repeatTimes = 5
-    val animatedState = animateIntAsState(targetValue = repeatTimes - 1 - currentPosition)
-
-    val swipeableState = rememberSwipeableState(initialValue = 0)
-    val sizePx = with(LocalDensity.current) { 40.dp.toPx() }
+    val animatedState = animateIntAsState(targetValue = currentPosition)
     Column(
         Modifier
             .fillMaxSize()
-            .swipeable(
-                state = swipeableState,
-                anchors = mapOf(0f to 0, sizePx to 1),
-                orientation = Orientation.Horizontal,
-            )
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDrag = { change: PointerInputChange, dragAmount: Offset ->
+                        change.consumeAllChanges()
+                        val (x, y) = dragAmount
+                        if (abs(x) > abs(y)) {
+                            directionState = if (x > 0) ">" else "<"
+                        } else {
+                            directionState = if (y > 0) "v" else "^"
+                        }
+                    },
+                    onDragEnd = {
+                        when (directionState) {
+                            ">" -> {
+                                currentPosition = 4
+                            }
+                            "<" -> {
+                                currentPosition = 0
+                            }
+                        }
+                    }
+                )
+            }
     ) {
-        Text(text = "${swipeableState.currentValue}")
+        Text(text = "$directionState")
+        Text(text = "anim: ${animatedState.value}")
+        Text(text = "current: $currentPosition")
         Button(onClick = {
             currentPosition = if (currentPosition == 0) {
                 repeatTimes - 1
