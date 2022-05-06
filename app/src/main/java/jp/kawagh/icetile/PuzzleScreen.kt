@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -75,6 +76,9 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
         }
         Text(text = "state: x:${viewModel.x},y:${viewModel.y}")
         Text(text = "${viewModel.puzzle.grid.length}")
+        Button(onClick = { viewModel.generatePuzzle() }) {
+            Text("gen")
+        }
     }
 }
 

@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 
 class PuzzleViewModel : ViewModel() {
     val gridSideLength = 9
-    val puzzle = Puzzle(
+    var puzzle = Puzzle(
         startX = 4, startY = 0,
         goalX = 3, goalY = 1,
         grid = """
@@ -27,6 +27,14 @@ class PuzzleViewModel : ViewModel() {
         private set
     var y by mutableStateOf(puzzle.startY)
         private set
+
+    fun generatePuzzle() {
+        puzzle = generateRandomPuzzle()
+        // to invoke rendering
+        x = if (x == 0) 1 else 0
+        x = puzzle.startX
+        y = puzzle.startY
+    }
 
     fun moveUp() {
         while (true) {
