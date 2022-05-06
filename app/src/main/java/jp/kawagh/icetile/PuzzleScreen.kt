@@ -22,7 +22,6 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
     var directionState by remember {
         mutableStateOf("-")
     }
-    val gridSideLength = 5
     val animatedStateX = animateIntAsState(targetValue = viewModel.x)
     val animatedStateY = animateIntAsState(targetValue = viewModel.y)
     Column(
@@ -51,28 +50,49 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
             }
     ) {
         Text(text = "state: x:${viewModel.x},y:${viewModel.y}")
+        Text(text = "${viewModel.puzzle.length}")
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black)
         ) {
-            val tileSideLength = size.minDimension / (2 * gridSideLength)
+            val tileSideLength = size.minDimension / (2 * viewModel.gridSideLength)
             val tileSize = Size(tileSideLength, tileSideLength)
-            repeat(gridSideLength * gridSideLength) { index ->
-                val row = index / gridSideLength
-                val col = index % gridSideLength
-                if (row == animatedStateY.value && col == animatedStateX.value) {
-                    drawRect(
-                        color = Color.Blue,
-                        topLeft = Offset(x = col * tileSideLength, y = row * tileSideLength),
-                        size = tileSize
-                    )
-                } else {
-                    drawRect(
-                        color = Color.Cyan,
-                        topLeft = Offset(x = col * tileSideLength, y = row * tileSideLength),
-                        size = tileSize
-                    )
+            viewModel.puzzle.forEachIndexed { index, c ->
+                val row = index / viewModel.gridSideLength
+                val col = index % viewModel.gridSideLength
+                when (c) {
+                    '-' -> {
+                        if (row == animatedStateY.value && col == animatedStateX.value) {
+                            drawRect(
+                                color = Color.Blue,
+                                topLeft = Offset(
+                                    x = col * tileSideLength,
+                                    y = row * tileSideLength
+                                ),
+                                size = tileSize
+                            )
+                        } else {
+                            drawRect(
+                                color = Color.Cyan,
+                                topLeft = Offset(
+                                    x = col * tileSideLength,
+                                    y = row * tileSideLength
+                                ),
+                                size = tileSize
+                            )
+                        }
+                    }
+                    'x' -> {
+                        drawRect(
+                            color = Color.Black,
+                            topLeft = Offset(
+                                x = col * tileSideLength,
+                                y = row * tileSideLength
+                            ),
+                            size = tileSize
+                        )
+                    }
                 }
             }
         }

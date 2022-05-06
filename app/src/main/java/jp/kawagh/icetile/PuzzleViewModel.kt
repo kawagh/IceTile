@@ -6,6 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class PuzzleViewModel : ViewModel() {
+    val gridSideLength = 5
+    val puzzle = """
+        -----
+        -----
+        x----
+        -----
+        -----
+    """.trimIndent().replace(Regex("""\n"""), "")
     var x by mutableStateOf(0)
         private set
     var y by mutableStateOf(0)
@@ -16,7 +24,7 @@ class PuzzleViewModel : ViewModel() {
     }
 
     fun moveDown() {
-        y = 4
+        y = gridSideLength - 1
     }
 
     fun moveLeft() {
@@ -24,6 +32,6 @@ class PuzzleViewModel : ViewModel() {
     }
 
     fun moveRight() {
-        x = 4
+        x = gridSideLength - 1
     }
 }
