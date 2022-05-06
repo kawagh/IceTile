@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
@@ -19,6 +20,7 @@ import kotlin.math.abs
 
 @Composable
 fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
+    val tileColorMap = mapOf('-' to Color.Cyan, 'g' to Color.White, 'x' to Color.Gray)
     var directionState by remember {
         mutableStateOf("-")
     }
@@ -57,44 +59,28 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                 .background(Color.Black)
         ) {
             val tileSideLength = size.minDimension / (2 * viewModel.gridSideLength)
-            val tileSize = Size(tileSideLength, tileSideLength)
             viewModel.puzzle.forEachIndexed { index, c ->
                 val row = index / viewModel.gridSideLength
                 val col = index % viewModel.gridSideLength
-                when (c) {
-                    '-' -> {
-                        if (row == animatedStateY.value && col == animatedStateX.value) {
-                            drawRect(
-                                color = Color.Blue,
-                                topLeft = Offset(
-                                    x = col * tileSideLength,
-                                    y = row * tileSideLength
-                                ),
-                                size = tileSize
-                            )
-                        } else {
-                            drawRect(
-                                color = Color.Cyan,
-                                topLeft = Offset(
-                                    x = col * tileSideLength,
-                                    y = row * tileSideLength
-                                ),
-                                size = tileSize
-                            )
-                        }
-                    }
-                    'x' -> {
-                        drawRect(
-                            color = Color.Black,
-                            topLeft = Offset(
-                                x = col * tileSideLength,
-                                y = row * tileSideLength
-                            ),
-                            size = tileSize
-                        )
+                if (row == animatedStateY.value && col == animatedStateX.value) {
+                    drawTile(Color.Blue, col, row, tileSideLength)
+                } else {
+                    if (tileColorMap.containsKey(c)) {
+                        drawTile(tileColorMap[c]!!, col, row, tileSideLength)
                     }
                 }
             }
         }
     }
+}
+
+private fun DrawScope.drawTile(color: Color, col: Int, row: Int, tileSideLength: Float) {
+    drawRect(
+        color = color,
+        topLeft = Offset(
+            x = col * tileSideLength,
+            y = row * tileSideLength
+        ),
+        size = Size(tileSideLength, tileSideLength)
+    )
 }

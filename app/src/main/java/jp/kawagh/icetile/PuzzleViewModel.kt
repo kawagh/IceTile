@@ -9,11 +9,12 @@ class PuzzleViewModel : ViewModel() {
     val gridSideLength = 5
     val puzzle = """
         -----
-        -----
+        ---x-
         x----
         -----
-        -----
+        --g--
     """.trimIndent().replace(Regex("""\n"""), "")
+
     var x by mutableStateOf(0)
         private set
     var y by mutableStateOf(0)
