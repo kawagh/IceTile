@@ -3,16 +3,19 @@ package jp.kawagh.icetile
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PuzzleScreen() {
     var currentPosition by remember {
@@ -20,7 +23,19 @@ fun PuzzleScreen() {
     }
     val repeatTimes = 5
     val animatedState = animateIntAsState(targetValue = repeatTimes - 1 - currentPosition)
-    Column(Modifier.fillMaxSize()) {
+
+    val swipeableState = rememberSwipeableState(initialValue = 0)
+    val sizePx = with(LocalDensity.current) { 40.dp.toPx() }
+    Column(
+        Modifier
+            .fillMaxSize()
+            .swipeable(
+                state = swipeableState,
+                anchors = mapOf(0f to 0, sizePx to 1),
+                orientation = Orientation.Horizontal,
+            )
+    ) {
+        Text(text = "${swipeableState.currentValue}")
         Button(onClick = {
             currentPosition = if (currentPosition == 0) {
                 repeatTimes - 1
