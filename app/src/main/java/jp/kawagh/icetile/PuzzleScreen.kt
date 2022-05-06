@@ -23,7 +23,7 @@ import kotlin.math.abs
 
 @Composable
 fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
-    val tileColorMap = mapOf('-' to Color.Cyan, 'g' to Color.White, 'x' to Color.Gray)
+    val tileColorMap = mapOf('.' to Color.Cyan, 'g' to Color.White, '#' to Color.Gray)
     var directionState by remember {
         mutableStateOf("-")
     }
@@ -61,7 +61,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                 .background(Color.Black),
         ) {
             val tileSideLength = size.minDimension / (viewModel.gridSideLength)
-            viewModel.puzzle.forEachIndexed { index, c ->
+            viewModel.puzzle.grid.forEachIndexed { index, c ->
                 val row = index / viewModel.gridSideLength
                 val col = index % viewModel.gridSideLength
                 if (row == animatedStateY.value && col == animatedStateX.value) {
@@ -74,7 +74,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
             }
         }
         Text(text = "state: x:${viewModel.x},y:${viewModel.y}")
-        Text(text = "${viewModel.puzzle.length}")
+        Text(text = "${viewModel.puzzle.grid.length}")
     }
 }
 
