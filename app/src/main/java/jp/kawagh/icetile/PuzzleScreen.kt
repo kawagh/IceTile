@@ -20,14 +20,18 @@ import kotlin.math.abs
 
 @Composable
 fun PuzzleScreen() {
-    var currentPosition by remember {
+    var currentPositionX by remember {
+        mutableStateOf(0)
+    }
+    var currentPositionY by remember {
         mutableStateOf(0)
     }
     var directionState by remember {
         mutableStateOf("-")
     }
-    val repeatTimes = 5
-    val animatedState = animateIntAsState(targetValue = currentPosition)
+    val gridSideLength = 5
+    val animatedStateX = animateIntAsState(targetValue = currentPositionX)
+    val animatedStateY = animateIntAsState(targetValue = currentPositionY)
     Column(
         Modifier
             .fillMaxSize()
@@ -45,22 +49,25 @@ fun PuzzleScreen() {
                     onDragEnd = {
                         when (directionState) {
                             ">" -> {
-                                currentPosition = 4
+                                currentPositionX = gridSideLength - 1
                             }
                             "<" -> {
-                                currentPosition = 0
+                                currentPositionX = 0
+                            }
+                            "v" -> {
+                                currentPositionY = gridSideLength - 1
+                            }
+                            "^" -> {
+                                currentPositionY = 0
                             }
                         }
                     }
                 )
             }
     ) {
-        Text(text = "$directionState")
-        Text(text = "anim: ${animatedState.value}")
-        Text(text = "current: $currentPosition")
         Button(onClick = {
-            currentPosition = if (currentPosition == 0) {
-                repeatTimes - 1
+            currentPositionX = if (currentPositionX == 0) {
+                gridSideLength - 1
             } else {
                 0
             }
@@ -72,19 +79,21 @@ fun PuzzleScreen() {
                 .fillMaxSize()
                 .background(Color.Black)
         ) {
-            val tileSideLength = size.minDimension / (2 * repeatTimes)
+            val tileSideLength = size.minDimension / (2 * gridSideLength)
             val tileSize = Size(tileSideLength, tileSideLength)
-            repeat(repeatTimes) { index ->
-                if (index == animatedState.value) {
+            repeat(gridSideLength * gridSideLength) { index ->
+                val row = index / 5
+                val col = index % 5
+                if (row == animatedStateY.value && col == animatedStateX.value) {
                     drawRect(
                         color = Color.Blue,
-                        topLeft = Offset(x = index * tileSideLength, y = 0f),
+                        topLeft = Offset(x = col * tileSideLength, y = row * tileSideLength),
                         size = tileSize
                     )
                 } else {
                     drawRect(
                         color = Color.Cyan,
-                        topLeft = Offset(x = index * tileSideLength, y = 0f),
+                        topLeft = Offset(x = col * tileSideLength, y = row * tileSideLength),
                         size = tileSize
                     )
                 }
