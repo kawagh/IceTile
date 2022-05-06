@@ -20,18 +20,63 @@ class PuzzleViewModel : ViewModel() {
         private set
 
     fun moveUp() {
-        y = 0
+        while (true) {
+            val nx = x
+            val ny = y - 1
+            val ni = gridSideLength * ny + nx
+            if (isInside(nx, ny) && puzzle[ni] != 'x') {
+                x = nx
+                y = ny
+            } else {
+                break
+            }
+        }
     }
 
     fun moveDown() {
-        y = gridSideLength - 1
+        while (true) {
+            val nx = x
+            val ny = y + 1
+            val ni = gridSideLength * ny + nx
+            if (isInside(nx, ny) && puzzle[ni] != 'x') {
+                x = nx
+                y = ny
+            } else {
+                break
+            }
+        }
     }
 
     fun moveLeft() {
-        x = 0
+        while (true) {
+            val nx = x - 1
+            val ny = y
+            val ni = gridSideLength * ny + nx
+            if (isInside(nx, ny) && puzzle[ni] != 'x') {
+                x = nx
+                y = ny
+            } else {
+                break
+            }
+        }
     }
 
     fun moveRight() {
-        x = gridSideLength - 1
+        while (true) {
+            val nx = x + 1
+            val ny = y
+            val ni = gridSideLength * ny + nx
+            if (isInside(nx, ny) && puzzle[ni] != 'x') {
+                x = nx
+                y = ny
+            } else {
+                break
+            }
+        }
     }
+
+    private fun isInside(x: Int, y: Int): Boolean {
+        return x in 0 until gridSideLength && y in 0 until gridSideLength
+    }
+
 }
