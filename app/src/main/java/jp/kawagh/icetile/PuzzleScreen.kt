@@ -4,10 +4,12 @@ import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -16,6 +18,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 
 @Composable
@@ -28,7 +31,6 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
     val animatedStateY = animateIntAsState(targetValue = viewModel.y)
     Column(
         Modifier
-            .fillMaxSize()
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDrag = { change: PointerInputChange, dragAmount: Offset ->
@@ -49,16 +51,16 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                         }
                     }
                 )
-            }
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "state: x:${viewModel.x},y:${viewModel.y}")
-        Text(text = "${viewModel.puzzle.length}")
         Canvas(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
+                .size(300.dp)
+                .background(Color.Black),
         ) {
-            val tileSideLength = size.minDimension / (2 * viewModel.gridSideLength)
+            val tileSideLength = size.minDimension / (viewModel.gridSideLength)
             viewModel.puzzle.forEachIndexed { index, c ->
                 val row = index / viewModel.gridSideLength
                 val col = index % viewModel.gridSideLength
@@ -71,6 +73,8 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                 }
             }
         }
+        Text(text = "state: x:${viewModel.x},y:${viewModel.y}")
+        Text(text = "${viewModel.puzzle.length}")
     }
 }
 
