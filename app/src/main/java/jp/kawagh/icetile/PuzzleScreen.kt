@@ -16,6 +16,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
@@ -25,6 +26,12 @@ import kotlin.math.abs
 @Composable
 fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
     val tileColorMap = mapOf('.' to Color.Cyan, 'g' to Color.White, '#' to Color.Gray)
+    val rotateMap = mapOf(
+        Direction.Up to 0f,
+        Direction.Right to 90f,
+        Direction.Down to 180f,
+        Direction.Left to 270f
+    )
     var directionState by remember {
         mutableStateOf("-")
     }
@@ -66,7 +73,22 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                 val row = index / viewModel.gridSideLength
                 val col = index % viewModel.gridSideLength
                 if (row == animatedStateY.value && col == animatedStateX.value) {
+                    // drawCurrentPosition
                     drawTile(Color.Blue, col, row, tileSideLength)
+                    val rotatePivot = Offset(
+                        col * tileSideLength + tileSideLength / 2,
+                        row * tileSideLength + tileSideLength / 2,
+                    )
+                    rotate(degrees = 45f + rotateMap[viewModel.direction]!!, pivot = rotatePivot) {
+                        drawRect(
+                            Color.Yellow,
+                            topLeft = Offset(
+                                col * tileSideLength + tileSideLength / 4,
+                                row * tileSideLength + tileSideLength / 4
+                            ),
+                            size = Size(tileSideLength / 4, tileSideLength / 4),
+                        )
+                    }
                 } else {
                     if (tileColorMap.containsKey(c)) {
                         drawTile(tileColorMap[c]!!, col, row, tileSideLength)

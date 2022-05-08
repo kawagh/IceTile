@@ -23,6 +23,8 @@ class PuzzleViewModel : ViewModel() {
     """.trimIndent().replace(Regex("""\n"""), "")
 
     )
+    var direction by mutableStateOf<Direction>(Direction.Down)
+        private set
     var x by mutableStateOf(puzzle.startX)
         private set
     var y by mutableStateOf(puzzle.startY)
@@ -37,6 +39,7 @@ class PuzzleViewModel : ViewModel() {
     }
 
     fun moveUp() {
+        direction = Direction.Up
         while (true) {
             val nx = x
             val ny = y - 1
@@ -50,6 +53,7 @@ class PuzzleViewModel : ViewModel() {
     }
 
     fun moveDown() {
+        direction = Direction.Down
         while (true) {
             val nx = x
             val ny = y + 1
@@ -63,6 +67,7 @@ class PuzzleViewModel : ViewModel() {
     }
 
     fun moveLeft() {
+        direction = Direction.Left
         while (true) {
             val nx = x - 1
             val ny = y
@@ -76,6 +81,7 @@ class PuzzleViewModel : ViewModel() {
     }
 
     fun moveRight() {
+        direction = Direction.Right
         while (true) {
             val nx = x + 1
             val ny = y
@@ -100,5 +106,11 @@ class PuzzleViewModel : ViewModel() {
     private fun isInside(x: Int, y: Int): Boolean {
         return x in 0 until gridSideLength && y in 0 until gridSideLength
     }
+}
 
+sealed class Direction {
+    object Up : Direction()
+    object Right : Direction()
+    object Down : Direction()
+    object Left : Direction()
 }
