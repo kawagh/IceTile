@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlin.math.abs
@@ -27,6 +28,21 @@ import kotlin.math.abs
 @Composable
 fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
     val tileColorMap = mapOf('.' to Color.Cyan, 'g' to Color.White, '#' to Color.Gray)
+    var resourceIndex by remember {
+        mutableStateOf(0)
+    }
+    val resources = listOf(
+        R.raw.p0,
+        R.raw.p1,
+        R.raw.p2,
+        R.raw.p3,
+        R.raw.p4,
+        R.raw.p5,
+        R.raw.p6,
+        R.raw.p7,
+        R.raw.p8,
+        R.raw.p9,
+    )
     val rotateMap = mapOf(
         Direction.Up to 0f,
         Direction.Right to 90f,
@@ -38,10 +54,19 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
     }
     val animatedStateX = animateIntAsState(targetValue = viewModel.x)
     val animatedStateY = animateIntAsState(targetValue = viewModel.y)
+    val context = LocalContext.current
+    val loadNextPuzzle: () -> Unit = {
+        resourceIndex = resourceIndex.plus(1).rem(resources.size)
+        val puzzleTextLines =
+            context.resources.openRawResource(resources[resourceIndex]).bufferedReader()
+                .use { it.readLines() }
+        viewModel.loadPuzzle(viewModel.parsePuzzle(puzzleTextLines))
+    }
+
     if (viewModel.isGoal()) {
         LaunchedEffect(Unit) {
             delay(500)
-            viewModel.generatePuzzle()
+            loadNextPuzzle()
         }
     }
     Column(
@@ -70,6 +95,11 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Button(onClick = {
+            loadNextPuzzle()
+        }) {
+            Text("load next")
+        }
         Canvas(
             modifier = Modifier
                 .size(300.dp)
@@ -105,7 +135,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
         }
         Text(text = "state: x:${viewModel.x},y:${viewModel.y}")
         Text(text = "${viewModel.puzzle.grid.length}")
-        Button(onClick = { viewModel.generatePuzzle() }) {
+        Button(onClick = { viewModel.loadPuzzle(viewModel.generatePuzzle()) }) {
             Text("gen")
         }
     }

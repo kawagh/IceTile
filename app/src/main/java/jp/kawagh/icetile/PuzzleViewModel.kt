@@ -23,6 +23,7 @@ class PuzzleViewModel : ViewModel() {
     """.trimIndent().replace(Regex("""\n"""), "")
 
     )
+
     var direction by mutableStateOf<Direction>(Direction.Down)
         private set
     var x by mutableStateOf(puzzle.startX)
@@ -30,13 +31,22 @@ class PuzzleViewModel : ViewModel() {
     var y by mutableStateOf(puzzle.startY)
         private set
 
-    fun generatePuzzle() {
-        puzzle = generateRandomPuzzle()
+    fun parsePuzzle(input: List<String>): Puzzle {
+        val (sy, sx) = input[1].split(" ").map { it.toInt() }
+        val (gy, gx) = input[2].split(" ").map { it.toInt() }
+        val ngrid = input.subList(3, input.size).joinToString("")
+        return Puzzle(startX = sx, startY = sy, goalX = gx, goalY = gy, grid = ngrid)
+    }
+
+    fun loadPuzzle(newPuzzle: Puzzle) {
         // to invoke rendering
         x = if (x == 0) 1 else 0
-        x = puzzle.startX
-        y = puzzle.startY
+        puzzle = newPuzzle
+        x = newPuzzle.startX
+        y = newPuzzle.startY
     }
+
+    fun generatePuzzle(): Puzzle = generateRandomPuzzle()
 
     fun isGoal(): Boolean = x == puzzle.goalX && y == puzzle.goalY
 
