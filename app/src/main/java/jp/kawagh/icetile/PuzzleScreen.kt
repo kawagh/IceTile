@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -93,6 +94,11 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Text(
+            "Q${resourceIndex + 1}/${resources.size}",
+            fontSize = MaterialTheme.typography.h4.fontSize
+        )
+        Spacer(modifier = Modifier.size(10.dp))
         Canvas(
             modifier = Modifier
                 .size(350.dp)
