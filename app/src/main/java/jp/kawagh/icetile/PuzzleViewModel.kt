@@ -31,6 +31,11 @@ class PuzzleViewModel : ViewModel() {
     var y by mutableStateOf(puzzle.startY)
         private set
 
+    fun resetPosition() {
+        x = puzzle.startX
+        y = puzzle.startY
+    }
+
     fun parsePuzzle(input: List<String>): Puzzle {
         val (sy, sx) = input[1].split(" ").map { it.toInt() }
         val (gy, gx) = input[2].split(" ").map { it.toInt() }

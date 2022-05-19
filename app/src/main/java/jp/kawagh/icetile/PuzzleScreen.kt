@@ -4,9 +4,7 @@ import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -95,11 +93,6 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Button(onClick = {
-            loadNextPuzzle()
-        }) {
-            Text("load next")
-        }
         Canvas(
             modifier = Modifier
                 .size(350.dp)
@@ -133,10 +126,19 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                 }
             }
         }
-        Text(text = "state: x:${viewModel.x},y:${viewModel.y}")
-        Text(text = "${viewModel.puzzle.grid.length}")
-        Button(onClick = { viewModel.loadPuzzle(viewModel.generatePuzzle()) }) {
-            Text("gen")
+        Spacer(modifier = Modifier.size(10.dp))
+
+        Row {
+            Button(onClick = { viewModel.resetPosition() }) {
+                Text("reset")
+            }
+            Spacer(modifier = Modifier.size(30.dp))
+            Button(onClick = {
+                loadNextPuzzle()
+            }) {
+                Text("next")
+            }
+
         }
     }
 }
