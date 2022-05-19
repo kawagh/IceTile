@@ -5,9 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +20,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @Composable
@@ -61,6 +60,9 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                 .use { it.readLines() }
         viewModel.loadPuzzle(viewModel.parsePuzzle(puzzleTextLines))
     }
+    val scope = rememberCoroutineScope()
+    val dataStore = AppDataStore(context)
+    val isFirstPlay = dataStore.getValue.collectAsState(initial = false).value
 
     if (viewModel.isGoal()) {
         LaunchedEffect(Unit) {
@@ -94,6 +96,18 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        if (isFirstPlay) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text("Tutorial") },
+                text = { Text("Swipe screen to the goal\nYou cannot stop until reaching block.") },
+                confirmButton = {
+                    TextButton(onClick = { scope.launch { dataStore.saveFirstPlay() } }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
         Text(
             "Q${resourceIndex + 1}/${resources.size}",
             fontSize = MaterialTheme.typography.h4.fontSize
