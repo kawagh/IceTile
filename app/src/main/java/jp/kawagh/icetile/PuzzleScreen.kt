@@ -21,6 +21,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlin.math.abs
 
 @Composable
@@ -37,6 +38,12 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
     }
     val animatedStateX = animateIntAsState(targetValue = viewModel.x)
     val animatedStateY = animateIntAsState(targetValue = viewModel.y)
+    if (viewModel.isGoal()) {
+        LaunchedEffect(Unit) {
+            delay(500)
+            viewModel.generatePuzzle()
+        }
+    }
     Column(
         Modifier
             .pointerInput(Unit) {

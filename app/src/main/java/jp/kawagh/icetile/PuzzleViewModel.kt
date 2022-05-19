@@ -38,6 +38,8 @@ class PuzzleViewModel : ViewModel() {
         y = puzzle.startY
     }
 
+    fun isGoal(): Boolean = x == puzzle.goalX && y == puzzle.goalY
+
     fun moveUp() {
         direction = Direction.Up
         while (true) {
