@@ -102,7 +102,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
         }
         Canvas(
             modifier = Modifier
-                .size(300.dp)
+                .size(350.dp)
                 .background(Color.Black),
         ) {
             val tileSideLength = size.minDimension / (viewModel.gridSideLength)
