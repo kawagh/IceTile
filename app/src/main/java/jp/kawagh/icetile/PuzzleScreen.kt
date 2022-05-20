@@ -158,6 +158,11 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
             }) {
                 Text("next")
             }
+            Spacer(modifier = Modifier.size(30.dp))
+            Button(onClick = { viewModel.loadPuzzle(viewModel.generatePuzzle()) }) {
+                Text("gen")
+
+            }
 
         }
     }

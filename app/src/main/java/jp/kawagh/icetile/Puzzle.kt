@@ -10,13 +10,22 @@ data class Puzzle(
 )
 
 fun generateRandomPuzzle(): Puzzle {
-    val content = List(79) { listOf('.', '#').random() }.joinToString("")
-    val grid = "s" + content + "g"
-    return Puzzle(
-        startX = 0,
-        startY = 0,
-        goalX = 9,
-        goalY = 9,
-        grid = grid,
-    )
+    val height = 9
+    val width = 9
+    val blockCount = 10
+    val gridArray = Array(height) { CharArray(width) { '.' } }
+    val choices = (0 until height * width).shuffled().take(blockCount + 2)
+    val sx = choices[0] / width
+    val sy = choices[0] % width
+    val gx = choices[1] / width
+    val gy = choices[1] % width
+    gridArray[sy][sx] = 's'
+    gridArray[gy][gx] = 'g'
+    for (index in choices.subList(2, choices.size)) {
+        val x = index / width
+        val y = index % width
+        gridArray[x][y] = '#'
+    }
+    val grid = gridArray.joinToString("") { it.joinToString("") }
+    return Puzzle(sx, sy, gx, gy, grid)
 }
