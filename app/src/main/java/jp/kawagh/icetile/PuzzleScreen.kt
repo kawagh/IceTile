@@ -7,7 +7,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.AllInclusive
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,7 +97,11 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                             viewModel.loadPuzzle(generateRandomSolvablePuzzle())
                         }
                     }) {
-                        Icon(Icons.Default.Settings, null)
+                        if (infiniteMode) {
+                            Icon(Icons.Default.AllInclusive, null)
+                        } else {
+                            Text("8", fontSize = MaterialTheme.typography.h5.fontSize)
+                        }
                     }
                 }
             )
