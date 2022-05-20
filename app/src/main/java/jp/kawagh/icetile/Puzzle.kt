@@ -9,6 +9,17 @@ data class Puzzle(
     val grid: String
 )
 
+fun generateRandomSolvablePuzzle(): Puzzle {
+    val minSteps = (5..10).random()
+    while (true) {
+        val puzzle = generateRandomPuzzle()
+        val result = solvePuzzle(puzzle)
+        if (result is SolvingResult.Success && result.steps >= minSteps) {
+            return puzzle
+        }
+    }
+}
+
 fun generateRandomPuzzle(): Puzzle {
     val height = 9
     val width = 9

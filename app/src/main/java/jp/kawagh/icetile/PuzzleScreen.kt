@@ -159,12 +159,9 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                 Text("next")
             }
             Spacer(modifier = Modifier.size(30.dp))
-            Button(onClick = { viewModel.loadPuzzle(viewModel.generatePuzzle()) }) {
-                Text("gen")
+            Button(onClick = { viewModel.loadPuzzle(generateRandomSolvablePuzzle()) }) {
+                Text("generate")
             }
-        }
-        if (solvePuzzle(viewModel.puzzle) is SolvingResult.Success) {
-            Text(solvePuzzle(viewModel.puzzle).toString())
         }
     }
 }
