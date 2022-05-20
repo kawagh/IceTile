@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AllInclusive
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +20,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,106 +67,150 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
     val dataStore = AppDataStore(context)
     val isFirstPlay = dataStore.getValue.collectAsState(initial = false).value
 
+    var infiniteMode by remember {
+        mutableStateOf(false)
+    }
+
     if (viewModel.isGoal()) {
         LaunchedEffect(Unit) {
             delay(500)
-            loadNextPuzzle()
+            if (infiniteMode) {
+                viewModel.loadPuzzle(generateRandomSolvablePuzzle())
+            } else {
+                loadNextPuzzle()
+            }
         }
     }
-    Column(
-        Modifier
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDrag = { change: PointerInputChange, dragAmount: Offset ->
-                        change.consumeAllChanges()
-                        val (x, y) = dragAmount
-                        if (abs(x) > abs(y)) {
-                            directionState = if (x > 0) ">" else "<"
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(id = R.string.app_name)) },
+                backgroundColor = Color.Cyan,
+                actions = {
+                    IconButton(onClick = {
+                        if (infiniteMode) {
+                            infiniteMode = false
+                            resourceIndex = resources.size - 1
+                            loadNextPuzzle()
                         } else {
-                            directionState = if (y > 0) "v" else "^"
+                            infiniteMode = true
+                            viewModel.loadPuzzle(generateRandomSolvablePuzzle())
                         }
-                    },
-                    onDragEnd = {
-                        when (directionState) {
-                            ">" -> viewModel.moveRight()
-                            "<" -> viewModel.moveLeft()
-                            "v" -> viewModel.moveDown()
-                            "^" -> viewModel.moveUp()
+                    }) {
+                        if (infiniteMode) {
+                            Icon(Icons.Default.AllInclusive, null)
+                        } else {
+                            Text("8", fontSize = MaterialTheme.typography.h5.fontSize)
                         }
-                    }
-                )
-            },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        if (isFirstPlay) {
-            AlertDialog(
-                onDismissRequest = {},
-                title = { Text("Tutorial") },
-                text = { Text("Swipe screen to the goal\nYou cannot stop until reaching block.") },
-                confirmButton = {
-                    TextButton(onClick = { scope.launch { dataStore.saveFirstPlay() } }) {
-                        Text("OK")
                     }
                 }
             )
-        }
-        Text(
-            "Q${resourceIndex + 1}/${resources.size}",
-            fontSize = MaterialTheme.typography.h4.fontSize
-        )
-        Spacer(modifier = Modifier.size(10.dp))
-        Canvas(
-            modifier = Modifier
-                .size(350.dp)
-                .background(Color.Black),
-        ) {
-            val tileSideLength = size.minDimension / (viewModel.gridSideLength)
-            viewModel.puzzle.grid.forEachIndexed { index, c ->
-                val row = index / viewModel.gridSideLength
-                val col = index % viewModel.gridSideLength
-                if (row == animatedStateY.value && col == animatedStateX.value) {
-                    // drawCurrentPosition
-                    drawTile(Color.Blue, col, row, tileSideLength)
-                    val rotatePivot = Offset(
-                        col * tileSideLength + tileSideLength / 2,
-                        row * tileSideLength + tileSideLength / 2,
-                    )
-                    rotate(degrees = 45f + rotateMap[viewModel.direction]!!, pivot = rotatePivot) {
-                        drawRect(
-                            Color.Yellow,
-                            topLeft = Offset(
-                                col * tileSideLength + tileSideLength / 4,
-                                row * tileSideLength + tileSideLength / 4
-                            ),
-                            size = Size(tileSideLength / 4, tileSideLength / 4),
+        },
+        content = {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDrag = { change: PointerInputChange, dragAmount: Offset ->
+                                change.consumeAllChanges()
+                                val (x, y) = dragAmount
+                                if (abs(x) > abs(y)) {
+                                    directionState = if (x > 0) ">" else "<"
+                                } else {
+                                    directionState = if (y > 0) "v" else "^"
+                                }
+                            },
+                            onDragEnd = {
+                                when (directionState) {
+                                    ">" -> viewModel.moveRight()
+                                    "<" -> viewModel.moveLeft()
+                                    "v" -> viewModel.moveDown()
+                                    "^" -> viewModel.moveUp()
+                                }
+                            }
                         )
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (isFirstPlay) {
+                    AlertDialog(
+                        onDismissRequest = {},
+                        title = { Text("Tutorial") },
+                        text = { Text("Swipe screen to the goal\nYou cannot stop until reaching block.") },
+                        confirmButton = {
+                            TextButton(onClick = { scope.launch { dataStore.saveFirstPlay() } }) {
+                                Text("OK")
+                            }
+                        }
+                    )
+                }
+                if (!infiniteMode) {
+                    Text(
+                        "Q${resourceIndex + 1}/${resources.size}",
+                        fontSize = MaterialTheme.typography.h4.fontSize
+                    )
+                }
+                Spacer(modifier = Modifier.size(10.dp))
+                Canvas(
+                    modifier = Modifier
+                        .size(350.dp)
+                        .background(Color.Black),
+                ) {
+                    val tileSideLength = size.minDimension / (viewModel.gridSideLength)
+                    viewModel.puzzle.grid.forEachIndexed { index, c ->
+                        val row = index / viewModel.gridSideLength
+                        val col = index % viewModel.gridSideLength
+                        if (row == animatedStateY.value && col == animatedStateX.value) {
+                            // drawCurrentPosition
+                            drawTile(Color.Blue, col, row, tileSideLength)
+                            val rotatePivot = Offset(
+                                col * tileSideLength + tileSideLength / 2,
+                                row * tileSideLength + tileSideLength / 2,
+                            )
+                            rotate(
+                                degrees = 45f + rotateMap[viewModel.direction]!!,
+                                pivot = rotatePivot
+                            ) {
+                                drawRect(
+                                    Color.Yellow,
+                                    topLeft = Offset(
+                                        col * tileSideLength + tileSideLength / 4,
+                                        row * tileSideLength + tileSideLength / 4
+                                    ),
+                                    size = Size(tileSideLength / 4, tileSideLength / 4),
+                                )
+                            }
+                        } else {
+                            if (tileColorMap.containsKey(c)) {
+                                drawTile(tileColorMap[c]!!, col, row, tileSideLength)
+                            }
+                        }
                     }
-                } else {
-                    if (tileColorMap.containsKey(c)) {
-                        drawTile(tileColorMap[c]!!, col, row, tileSideLength)
+                }
+                Spacer(modifier = Modifier.size(10.dp))
+
+                Row {
+                    Button(onClick = { viewModel.resetPosition() }) {
+                        Text("reset")
+                    }
+                    Spacer(modifier = Modifier.size(30.dp))
+                    if (infiniteMode) {
+                        Button(onClick = { viewModel.loadPuzzle(generateRandomSolvablePuzzle()) }) {
+                            Text("generate")
+                        }
+                    } else {
+                        Button(onClick = {
+                            loadNextPuzzle()
+                        }) {
+                            Text("next")
+                        }
                     }
                 }
             }
         }
-        Spacer(modifier = Modifier.size(10.dp))
-
-        Row {
-            Button(onClick = { viewModel.resetPosition() }) {
-                Text("reset")
-            }
-            Spacer(modifier = Modifier.size(30.dp))
-            Button(onClick = {
-                loadNextPuzzle()
-            }) {
-                Text("next")
-            }
-            Spacer(modifier = Modifier.size(30.dp))
-            Button(onClick = { viewModel.loadPuzzle(generateRandomSolvablePuzzle()) }) {
-                Text("generate")
-            }
-        }
-    }
+    )
 }
 
 private fun DrawScope.drawTile(color: Color, col: Int, row: Int, tileSideLength: Float) {
