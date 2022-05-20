@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.AllInclusive
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -100,7 +101,11 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                         if (infiniteMode) {
                             Icon(Icons.Default.AllInclusive, null)
                         } else {
-                            Text("8", fontSize = MaterialTheme.typography.h5.fontSize)
+                            Text(
+                                "8",
+                                fontSize = MaterialTheme.typography.h5.fontSize,
+                                modifier = Modifier.rotate(45f)
+                            )
                         }
                     }
                 }
