@@ -51,7 +51,6 @@ class PuzzleViewModel : ViewModel() {
         y = newPuzzle.startY
     }
 
-    fun generatePuzzle(): Puzzle = generateRandomPuzzle()
 
     fun isGoal(): Boolean = x == puzzle.goalX && y == puzzle.goalY
 
