@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +20,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,17 +67,41 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
     val dataStore = AppDataStore(context)
     val isFirstPlay = dataStore.getValue.collectAsState(initial = false).value
 
-    if (viewModel.isGoal()) {
-        LaunchedEffect(Unit) {
-            delay(500)
-            loadNextPuzzle()
-        }
-    }
-
     var infiniteMode by remember {
         mutableStateOf(false)
     }
+
+    if (viewModel.isGoal()) {
+        LaunchedEffect(Unit) {
+            delay(500)
+            if (infiniteMode) {
+                viewModel.loadPuzzle(generateRandomSolvablePuzzle())
+            } else {
+                loadNextPuzzle()
+            }
+        }
+    }
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(id = R.string.app_name)) },
+                backgroundColor = Color.Cyan,
+                actions = {
+                    IconButton(onClick = {
+                        if (infiniteMode) {
+                            infiniteMode = false
+                            resourceIndex = resources.size - 1
+                            loadNextPuzzle()
+                        } else {
+                            infiniteMode = true
+                            viewModel.loadPuzzle(generateRandomSolvablePuzzle())
+                        }
+                    }) {
+                        Icon(Icons.Default.Settings, null)
+                    }
+                }
+            )
+        },
         content = {
             Column(
                 Modifier
@@ -115,10 +142,12 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                         }
                     )
                 }
-                Text(
-                    "Q${resourceIndex + 1}/${resources.size}",
-                    fontSize = MaterialTheme.typography.h4.fontSize
-                )
+                if (!infiniteMode) {
+                    Text(
+                        "Q${resourceIndex + 1}/${resources.size}",
+                        fontSize = MaterialTheme.typography.h4.fontSize
+                    )
+                }
                 Spacer(modifier = Modifier.size(10.dp))
                 Canvas(
                     modifier = Modifier
@@ -163,14 +192,16 @@ fun PuzzleScreen(viewModel: PuzzleViewModel = PuzzleViewModel()) {
                         Text("reset")
                     }
                     Spacer(modifier = Modifier.size(30.dp))
-                    Button(onClick = {
-                        loadNextPuzzle()
-                    }) {
-                        Text("next")
-                    }
-                    Spacer(modifier = Modifier.size(30.dp))
-                    Button(onClick = { viewModel.loadPuzzle(generateRandomSolvablePuzzle()) }) {
-                        Text("generate")
+                    if (infiniteMode) {
+                        Button(onClick = { viewModel.loadPuzzle(generateRandomSolvablePuzzle()) }) {
+                            Text("generate")
+                        }
+                    } else {
+                        Button(onClick = {
+                            loadNextPuzzle()
+                        }) {
+                            Text("next")
+                        }
                     }
                 }
             }
